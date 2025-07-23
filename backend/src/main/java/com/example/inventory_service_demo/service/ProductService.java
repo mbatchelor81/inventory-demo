@@ -1,6 +1,7 @@
 package com.example.inventory_service_demo.service;
 
 import com.example.inventory_service_demo.model.Product;
+import com.example.inventory_service_demo.repository.CategoryRepository;
 import com.example.inventory_service_demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public List<Product> getAllProducts() {
@@ -52,8 +55,13 @@ public class ProductService {
         product.setDescription(productDetails.getDescription());
         product.setSku(productDetails.getSku());
         product.setPrice(productDetails.getPrice());
+        product.setCategory(productDetails.getCategory());
 
         return productRepository.save(product);
+    }
+
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
     }
 
     public void deleteProduct(Long id) {
