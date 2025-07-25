@@ -1,6 +1,6 @@
 ---
 trigger: glob
-globs: backend/**
+globs: backend/**/*
 ---
 
 You are an expert in Java programming, Spring Boot, Spring Framework, Maven, JUnit, and related Java technologies.

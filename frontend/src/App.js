@@ -1,22 +1,29 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import Dashboard from './components/common/Dashboard';
+import ProductList from './components/products/ProductList';
+import ProductForm from './components/products/ProductForm';
+import InventoryList from './components/inventory/InventoryList';
+import OrderList from './components/orders/OrderList';
+import OrderForm from './components/orders/OrderForm';
 import './App.css';
-import HealthCheck from './components/HealthCheck';
 
 function App() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Inventory Management System</h1>
-      </header>
-      <main className="app-content">
-        <div className="health-check-container">
-          <h2>System Status</h2>
-          <HealthCheck />
-        </div>
-      </main>
-      <footer className="app-footer">
-        <p>Inventory Service Demo</p>
-      </footer>
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/products/new" element={<ProductForm />} />
+          <Route path="/products/edit/:id" element={<ProductForm />} />
+          <Route path="/inventory" element={<InventoryList />} />
+          <Route path="/orders" element={<OrderList />} />
+          <Route path="/orders/new" element={<OrderForm />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
