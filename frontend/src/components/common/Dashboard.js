@@ -119,15 +119,12 @@ const Dashboard = () => {
           <h3>Quick Actions</h3>
           <div className="quick-actions">
             <button className="action-button">
-              <i className="fas fa-plus-circle"></i>
               <span>Add Product</span>
             </button>
             <button className="action-button">
-              <i className="fas fa-clipboard-list"></i>
               <span>Check Inventory</span>
             </button>
             <button className="action-button">
-              <i className="fas fa-shopping-cart"></i>
               <span>Create Order</span>
             </button>
           </div>
