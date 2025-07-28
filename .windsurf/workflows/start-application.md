@@ -40,4 +40,5 @@ The script creates log files in the `logs/` directory for debugging:
 - `logs/frontend.log` - React development server logs
 
 ## Start a preview
-- Start a preview of the application now that it is running.
+- Start a preview of the application now that it is running
+- Do not try to take a screenshot using the browser features
