@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import Dashboard from './components/common/Dashboard';
+import Dashboard from './components/dashboard/Dashboard';
 import ProductList from './components/products/ProductList';
 import ProductForm from './components/products/ProductForm';
 import InventoryList from './components/inventory/InventoryList';

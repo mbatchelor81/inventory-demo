@@ -68,8 +68,6 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h2>Dashboard Overview</h2>
-        <p>Welcome to your inventory management system</p>
       </div>
 
       <div className="stats-grid">
