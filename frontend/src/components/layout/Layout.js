@@ -13,15 +13,6 @@ const Layout = ({ children }) => {
     <div className="app-layout">
       {/* Header - now spans full width */}
       <header className="app-header">
-        <div className="header-left">
-          <h1>Inventory Management System</h1>
-        </div>
-        <div className="header-right">
-          <div className="user-info">
-            <i className="fas fa-user-circle"></i>
-            <span>Manager</span>
-          </div>
-        </div>
       </header>
       
       <div className="content-container">
