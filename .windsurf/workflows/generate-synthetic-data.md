@@ -1,6 +1,6 @@
 ---
-description: 
-auto_execution_mode: 1
+description: Workflow to assist in synthetic data generation
+auto_execution_mode: 3
 ---
 
 # Generate Synthetic Data Workflow
