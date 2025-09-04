@@ -1,12 +1,8 @@
 package com.example.inventory_service_demo.config;
 
-import com.example.inventory_service_demo.model.Inventory;
 import com.example.inventory_service_demo.model.OrderItem;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.model.PurchaseOrder;
-import com.example.inventory_service_demo.repository.InventoryRepository;
-import com.example.inventory_service_demo.repository.OrderItemRepository;
-import com.example.inventory_service_demo.repository.ProductRepository;
 import com.example.inventory_service_demo.repository.PurchaseOrderRepository;
 import com.example.inventory_service_demo.service.InventoryService;
 import com.example.inventory_service_demo.service.ProductService;
@@ -16,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 /**
  * Component to initialize sample data for the application.
@@ -26,25 +21,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private final ProductService productService;
     private final InventoryService inventoryService;
-    private final ProductRepository productRepository;
-    private final InventoryRepository inventoryRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
-    private final OrderItemRepository orderItemRepository;
 
     @Autowired
     public DataInitializer(
             ProductService productService, 
             InventoryService inventoryService,
-            ProductRepository productRepository, 
-            InventoryRepository inventoryRepository,
-            PurchaseOrderRepository purchaseOrderRepository,
-            OrderItemRepository orderItemRepository) {
+            PurchaseOrderRepository purchaseOrderRepository) {
         this.productService = productService;
         this.inventoryService = inventoryService;
-        this.productRepository = productRepository;
-        this.inventoryRepository = inventoryRepository;
         this.purchaseOrderRepository = purchaseOrderRepository;
-        this.orderItemRepository = orderItemRepository;
     }
 
     @Override

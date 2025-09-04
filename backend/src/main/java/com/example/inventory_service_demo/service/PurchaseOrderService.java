@@ -6,7 +6,6 @@ import com.example.inventory_service_demo.model.OrderItem;
 import com.example.inventory_service_demo.model.OrderStatus;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.model.PurchaseOrder;
-import com.example.inventory_service_demo.repository.OrderItemRepository;
 import com.example.inventory_service_demo.repository.ProductRepository;
 import com.example.inventory_service_demo.repository.PurchaseOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,18 +23,15 @@ import java.util.Optional;
 public class PurchaseOrderService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final InventoryService inventoryService;
 
     @Autowired
     public PurchaseOrderService(
             PurchaseOrderRepository purchaseOrderRepository,
-            OrderItemRepository orderItemRepository,
             ProductRepository productRepository,
             InventoryService inventoryService) {
         this.purchaseOrderRepository = purchaseOrderRepository;
-        this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
         this.inventoryService = inventoryService;
     }
