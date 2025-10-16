@@ -11,7 +11,7 @@ SonarQube Cloud is configured to analyze both the backend (Spring Boot/Java) and
 ### 1. `sonar-project.properties`
 Main configuration file at the root of the project containing:
 - Organization key: `mbatchelor81`
-- Project key: `mbatchelor81_inventory-service-demo`
+- Project key: `mbatchelor81_inventory-demo`
 - Source and test paths for both backend and frontend
 - Coverage and exclusion settings
 
