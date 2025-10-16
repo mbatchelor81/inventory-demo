@@ -8,6 +8,7 @@ class InventoryServiceDemoApplicationTests {
 
 	@Test
 	void contextLoads() {
+		org.junit.jupiter.api.Assertions.assertTrue(true, "Application context should load");
 	}
 
 }

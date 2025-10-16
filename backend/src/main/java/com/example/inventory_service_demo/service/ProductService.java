@@ -20,6 +20,8 @@ public class ProductService {
     
     @PersistenceContext
     private EntityManager entityManager;
+    
+    private final java.security.SecureRandom secureRandom = new java.security.SecureRandom();
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -73,9 +75,11 @@ public class ProductService {
     // INTENTIONAL VULNERABILITY: SQL Injection via string concatenation
     @SuppressWarnings("unchecked")
     public List<Product> searchProducts(String searchTerm) {
-        // Vulnerable: User input directly concatenated into SQL query
-        String sql = "SELECT * FROM product WHERE name LIKE '%" + searchTerm + "%'";
-        return entityManager.createNativeQuery(sql, Product.class).getResultList();
+        // Fixed: Use parameterized query to prevent SQL injection
+        String sql = "SELECT * FROM product WHERE name LIKE :searchTerm";
+        return entityManager.createNativeQuery(sql, Product.class)
+                .setParameter("searchTerm", "%" + searchTerm + "%")
+                .getResultList();
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
@@ -93,16 +97,15 @@ public class ProductService {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
+            throw new IllegalStateException("MD5 algorithm not found", e);
         }
     }
     
     // INTENTIONAL VULNERABILITY #5: Insecure Random - Using predictable Random
     @SuppressWarnings("java:S2245")
     public String generateProductCode() {
-        // Vulnerable: java.util.Random is predictable and not cryptographically secure
-        Random random = new Random();
-        int code = random.nextInt(999999);
+        // Fixed: Use SecureRandom as a reusable class field for cryptographic security
+        int code = secureRandom.nextInt(999999);
         return String.format("PROD-%06d", code);
     }
 }
