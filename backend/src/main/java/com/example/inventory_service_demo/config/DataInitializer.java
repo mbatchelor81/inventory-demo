@@ -3,9 +3,11 @@ package com.example.inventory_service_demo.config;
 import com.example.inventory_service_demo.model.OrderItem;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.model.PurchaseOrder;
+import com.example.inventory_service_demo.model.Category;
 import com.example.inventory_service_demo.repository.PurchaseOrderRepository;
 import com.example.inventory_service_demo.service.InventoryService;
 import com.example.inventory_service_demo.service.ProductService;
+import com.example.inventory_service_demo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -22,15 +24,18 @@ public class DataInitializer implements CommandLineRunner {
     private final ProductService productService;
     private final InventoryService inventoryService;
     private final PurchaseOrderRepository purchaseOrderRepository;
+    private final CategoryService categoryService;
 
     @Autowired
     public DataInitializer(
             ProductService productService, 
             InventoryService inventoryService,
-            PurchaseOrderRepository purchaseOrderRepository) {
+            PurchaseOrderRepository purchaseOrderRepository,
+            CategoryService categoryService) {
         this.productService = productService;
         this.inventoryService = inventoryService;
         this.purchaseOrderRepository = purchaseOrderRepository;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -42,13 +47,30 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void loadSampleData() {
-        // Create sample products
+        Category electronics = new Category(
+                "Electronics",
+                "Electronic devices and gadgets"
+        );
+        Category audio = new Category(
+                "Audio",
+                "Audio equipment and accessories"
+        );
+        Category wearables = new Category(
+                "Wearables",
+                "Wearable technology and fitness devices"
+        );
+        
+        Category savedElectronics = categoryService.createCategory(electronics);
+        Category savedAudio = categoryService.createCategory(audio);
+        Category savedWearables = categoryService.createCategory(wearables);
+        
         Product laptop = new Product(
                 "Laptop Pro X1",
                 "High-performance laptop with 16GB RAM and 512GB SSD",
                 "LP-X1-2025",
                 new BigDecimal("1299.99")
         );
+        laptop.setCategory(savedElectronics);
         
         Product smartphone = new Product(
                 "SmartPhone Galaxy",
@@ -56,6 +78,7 @@ public class DataInitializer implements CommandLineRunner {
                 "SP-G-2025",
                 new BigDecimal("899.99")
         );
+        smartphone.setCategory(savedElectronics);
         
         Product headphones = new Product(
                 "Noise Cancelling Headphones",
@@ -63,6 +86,7 @@ public class DataInitializer implements CommandLineRunner {
                 "NC-HP-2025",
                 new BigDecimal("249.99")
         );
+        headphones.setCategory(savedAudio);
         
         Product tablet = new Product(
                 "Tablet Air",
@@ -70,6 +94,7 @@ public class DataInitializer implements CommandLineRunner {
                 "TA-10-2025",
                 new BigDecimal("499.99")
         );
+        tablet.setCategory(savedElectronics);
         
         Product smartwatch = new Product(
                 "Fitness Watch Pro",
@@ -77,6 +102,7 @@ public class DataInitializer implements CommandLineRunner {
                 "FW-P-2025",
                 new BigDecimal("199.99")
         );
+        smartwatch.setCategory(savedWearables);
 
         // Save products
         Product savedLaptop = productService.createProduct(laptop);
