@@ -53,7 +53,7 @@ jobs:
       - name: Run frontend tests with coverage
         run: |
           cd frontend
-          npm test -- --coverage --watchAll=false
+          CI=true npm test -- --coverage --watchAll=false
       
       - name: SonarQube Scan
         env:
