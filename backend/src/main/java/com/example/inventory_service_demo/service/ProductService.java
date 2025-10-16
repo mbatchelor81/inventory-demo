@@ -70,12 +70,12 @@ public class ProductService {
         productRepository.delete(product);
     }
     
-    // INTENTIONAL VULNERABILITY: SQL Injection via string concatenation
     @SuppressWarnings("unchecked")
     public List<Product> searchProducts(String searchTerm) {
-        // Vulnerable: User input directly concatenated into SQL query
-        String sql = "SELECT * FROM product WHERE name LIKE '%" + searchTerm + "%'";
-        return entityManager.createNativeQuery(sql, Product.class).getResultList();
+        String sql = "SELECT * FROM product WHERE name LIKE :searchTerm";
+        return entityManager.createNativeQuery(sql, Product.class)
+                .setParameter("searchTerm", "%" + searchTerm + "%")
+                .getResultList();
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing

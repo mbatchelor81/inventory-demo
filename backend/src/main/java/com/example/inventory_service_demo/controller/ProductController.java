@@ -12,7 +12,6 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/products")
@@ -77,7 +76,6 @@ public class ProductController {
         }
     }
     
-    // INTENTIONAL VULNERABILITY: SQL Injection endpoint
     @GetMapping("/search")
     public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
         List<Product> products = productService.searchProducts(query);
