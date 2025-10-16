@@ -1,0 +1,78 @@
+<div class="product-list">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">Loading products...</div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-message">
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+    <button (click)="fetchProducts()" class="btn btn-secondary">Retry</button>
+  </div>
+
+  <!-- Product List Content -->
+  <div *ngIf="!loading && !error">
+    <div class="product-list-header">
+      <h2>Product Management</h2>
+      <button (click)="addProduct()" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Product
+      </button>
+    </div>
+
+    <div class="product-list-controls">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+    </div>
+
+    <!-- No Products State -->
+    <div *ngIf="filteredProducts.length === 0" class="no-products">
+      <i class="fas fa-box-open"></i>
+      <h3>No products found</h3>
+      <p>{{ searchTerm ? 'Try adjusting your search criteria' : 'Get started by adding your first product' }}</p>
+      <button *ngIf="!searchTerm" (click)="addProduct()" class="btn btn-primary">Add Product</button>
+    </div>
+
+    <!-- Products Table -->
+    <div *ngIf="filteredProducts.length > 0" class="product-table-container">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of filteredProducts">
+            <td>
+              <div class="product-info">
+                <div class="product-name">{{ product.name }}</div>
+              </div>
+            </td>
+            <td>{{ product.sku }}</td>
+            <td>{{ product.description || '-' }}</td>
+            <td>${{ product.price ? product.price.toFixed(2) : '0.00' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button (click)="editProduct(product.id)" class="btn btn-secondary btn-sm">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button (click)="deleteProduct(product.id)" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

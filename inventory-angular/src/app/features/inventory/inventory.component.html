@@ -1,0 +1,86 @@
+<div class="inventory-list">
+  <div *ngIf="loading" class="loading">Loading inventory...</div>
+
+  <div *ngIf="error && !loading" class="error-message">
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+    <button (click)="fetchInventory()" class="btn btn-secondary">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <div class="inventory-list-header">
+      <h2>Inventory Tracking</h2>
+      <button (click)="fetchInventory()" class="btn btn-secondary">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
+    <div class="inventory-list-controls">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Search inventory..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+    </div>
+
+    <div *ngIf="filteredInventory.length === 0" class="no-inventory">
+      <i class="fas fa-clipboard-list"></i>
+      <h3>No inventory items found</h3>
+      <p>{{ searchTerm ? 'Try adjusting your search criteria' : 'No inventory items available' }}</p>
+    </div>
+
+    <div *ngIf="filteredInventory.length > 0" class="inventory-table-container">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Current Stock</th>
+            <th>Status</th>
+            <th>Adjust Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredInventory">
+            <td>
+              <div class="product-info">
+                <div class="product-name">{{ item.product.name }}</div>
+              </div>
+            </td>
+            <td>{{ item.product.sku }}</td>
+            <td>
+              <div class="quantity-display">{{ item.quantity }}</div>
+            </td>
+            <td>
+              <span [class]="'stock-status ' + getStockStatus(item.quantity)">
+                {{ getStockStatusText(item.quantity) }}
+              </span>
+            </td>
+            <td>
+              <div class="adjust-controls">
+                <button 
+                  (click)="adjustQuantity(item.product.id, item.quantity, -1)"
+                  [disabled]="adjustingItems[item.product.id]"
+                  class="btn btn-secondary btn-sm">
+                  <i *ngIf="adjustingItems[item.product.id]" class="fas fa-spinner fa-spin"></i>
+                  <i *ngIf="!adjustingItems[item.product.id]" class="fas fa-minus"></i>
+                </button>
+                <button 
+                  (click)="adjustQuantity(item.product.id, item.quantity, 1)"
+                  [disabled]="adjustingItems[item.product.id]"
+                  class="btn btn-primary btn-sm">
+                  <i *ngIf="adjustingItems[item.product.id]" class="fas fa-spinner fa-spin"></i>
+                  <i *ngIf="!adjustingItems[item.product.id]" class="fas fa-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

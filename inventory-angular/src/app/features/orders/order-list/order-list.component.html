@@ -1,0 +1,104 @@
+<div class="order-list">
+  <div *ngIf="loading" class="loading">Loading orders...</div>
+
+  <div *ngIf="error && !loading" class="error-message">
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+    <button (click)="fetchOrders()" class="btn btn-secondary">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <div class="order-list-header">
+      <h2>Order Management</h2>
+      <button (click)="createOrder()" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create Order
+      </button>
+    </div>
+
+    <div class="order-list-controls">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Search orders..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+      
+      <div class="filter-box">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+          <option value="ALL">All Status</option>
+          <option value="CREATED">Created</option>
+          <option value="PROCESSING">Processing</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="filteredOrders.length === 0" class="no-orders">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>No orders found</h3>
+      <p>{{ (searchTerm || statusFilter !== 'ALL') ? 'Try adjusting your search criteria' : 'Get started by creating your first order' }}</p>
+      <button *ngIf="!searchTerm && statusFilter === 'ALL'" (click)="createOrder()" class="btn btn-primary">Create Order</button>
+    </div>
+
+    <div *ngIf="filteredOrders.length > 0" class="order-table-container">
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Items</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td><div class="order-id">#{{ order.id }}</div></td>
+            <td>
+              <div class="customer-info">
+                <div class="customer-name">{{ order.customerName || 'N/A' }}</div>
+                <div class="customer-email">{{ order.customerEmail || 'N/A' }}</div>
+              </div>
+            </td>
+            <td>{{ formatDate(order.orderDate) }}</td>
+            <td>
+              <span [class]="'status-badge ' + getStatusBadge(order.status)">
+                {{ order.status }}
+              </span>
+            </td>
+            <td>${{ order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' }}</td>
+            <td>{{ order.items ? order.items.length : 0 }} items</td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  *ngIf="order.status === 'CREATED'"
+                  (click)="processOrder(order.id)"
+                  [disabled]="processingOrders[order.id]"
+                  class="btn btn-primary btn-sm">
+                  <i *ngIf="processingOrders[order.id]" class="fas fa-spinner fa-spin"></i>
+                  <i *ngIf="!processingOrders[order.id]" class="fas fa-play"></i>
+                  Process
+                </button>
+                <button 
+                  *ngIf="order.status === 'CREATED' || order.status === 'PROCESSING'"
+                  (click)="cancelOrder(order.id)"
+                  [disabled]="processingOrders[order.id]"
+                  class="btn btn-danger btn-sm">
+                  <i *ngIf="processingOrders[order.id]" class="fas fa-spinner fa-spin"></i>
+                  <i *ngIf="!processingOrders[order.id]" class="fas fa-times"></i>
+                  Cancel
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
