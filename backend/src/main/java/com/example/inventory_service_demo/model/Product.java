@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -30,7 +32,10 @@ public class Product {
     @Positive(message = "Price must be positive")
     private BigDecimal price;
 
-    // Default constructor required by JPA
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     public Product() {
     }
 
@@ -82,6 +87,14 @@ public class Product {
         this.price = price;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -90,6 +103,7 @@ public class Product {
                 ", description='" + description + '\'' +
                 ", sku='" + sku + '\'' +
                 ", price=" + price +
+                ", category=" + (category != null ? category.getName() : "null") +
                 '}';
     }
 }

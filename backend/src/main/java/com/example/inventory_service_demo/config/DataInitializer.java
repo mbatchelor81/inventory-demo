@@ -1,9 +1,11 @@
 package com.example.inventory_service_demo.config;
 
+import com.example.inventory_service_demo.model.Category;
 import com.example.inventory_service_demo.model.OrderItem;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.model.PurchaseOrder;
 import com.example.inventory_service_demo.repository.PurchaseOrderRepository;
+import com.example.inventory_service_demo.service.CategoryService;
 import com.example.inventory_service_demo.service.InventoryService;
 import com.example.inventory_service_demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +23,18 @@ public class DataInitializer implements CommandLineRunner {
 
     private final ProductService productService;
     private final InventoryService inventoryService;
+    private final CategoryService categoryService;
     private final PurchaseOrderRepository purchaseOrderRepository;
 
     @Autowired
     public DataInitializer(
             ProductService productService, 
             InventoryService inventoryService,
+            CategoryService categoryService,
             PurchaseOrderRepository purchaseOrderRepository) {
         this.productService = productService;
         this.inventoryService = inventoryService;
+        this.categoryService = categoryService;
         this.purchaseOrderRepository = purchaseOrderRepository;
     }
 
@@ -78,12 +83,30 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("199.99")
         );
 
-        // Save products
         Product savedLaptop = productService.createProduct(laptop);
         Product savedSmartphone = productService.createProduct(smartphone);
         Product savedHeadphones = productService.createProduct(headphones);
         Product savedTablet = productService.createProduct(tablet);
         Product savedSmartwatch = productService.createProduct(smartwatch);
+
+        Category electronics = new Category("Electronics", "Electronic devices and gadgets", null);
+        Category savedElectronics = categoryService.createCategory(electronics);
+
+        Category computers = new Category("Computers", "Desktop and laptop computers", savedElectronics.getId());
+        Category mobileDevices = new Category("Mobile Devices", "Smartphones and tablets", savedElectronics.getId());
+        Category audioEquipment = new Category("Audio Equipment", "Headphones, speakers, and audio devices", savedElectronics.getId());
+        Category wearables = new Category("Wearables", "Smartwatches and fitness trackers", savedElectronics.getId());
+
+        Category savedComputers = categoryService.createCategory(computers);
+        Category savedMobileDevices = categoryService.createCategory(mobileDevices);
+        Category savedAudioEquipment = categoryService.createCategory(audioEquipment);
+        Category savedWearables = categoryService.createCategory(wearables);
+
+        categoryService.assignProductToCategory(savedLaptop.getId(), savedComputers.getId());
+        categoryService.assignProductToCategory(savedSmartphone.getId(), savedMobileDevices.getId());
+        categoryService.assignProductToCategory(savedHeadphones.getId(), savedAudioEquipment.getId());
+        categoryService.assignProductToCategory(savedTablet.getId(), savedMobileDevices.getId());
+        categoryService.assignProductToCategory(savedSmartwatch.getId(), savedWearables.getId());
 
         // Initialize inventory
         inventoryService.createOrUpdateInventory(savedLaptop.getId(), 15);

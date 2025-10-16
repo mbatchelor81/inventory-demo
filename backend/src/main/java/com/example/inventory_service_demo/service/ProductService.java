@@ -1,6 +1,7 @@
 package com.example.inventory_service_demo.service;
 
 import com.example.inventory_service_demo.model.Product;
+import com.example.inventory_service_demo.repository.CategoryRepository;
 import com.example.inventory_service_demo.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -17,13 +18,15 @@ import java.util.Random;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public List<Product> getAllProducts() {
@@ -39,10 +42,15 @@ public class ProductService {
     }
 
     public Product createProduct(Product product) {
-        // Check if product with the same SKU already exists
         if (productRepository.existsBySku(product.getSku())) {
             throw new IllegalArgumentException("Product with SKU " + product.getSku() + " already exists");
         }
+        
+        if (product.getCategory() != null && product.getCategory().getId() != null) {
+            categoryRepository.findById(product.getCategory().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + product.getCategory().getId()));
+        }
+        
         return productRepository.save(product);
     }
 
@@ -50,16 +58,21 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
 
-        // If SKU is changing, check that the new SKU doesn't already exist
         if (!product.getSku().equals(productDetails.getSku()) && 
             productRepository.existsBySku(productDetails.getSku())) {
             throw new IllegalArgumentException("Product with SKU " + productDetails.getSku() + " already exists");
+        }
+        
+        if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
+            categoryRepository.findById(productDetails.getCategory().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + productDetails.getCategory().getId()));
         }
 
         product.setName(productDetails.getName());
         product.setDescription(productDetails.getDescription());
         product.setSku(productDetails.getSku());
         product.setPrice(productDetails.getPrice());
+        product.setCategory(productDetails.getCategory());
 
         return productRepository.save(product);
     }
