@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/products")
@@ -78,5 +82,24 @@ public class ProductController {
     public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
         List<Product> products = productService.searchProducts(query);
         return ResponseEntity.ok(products);
+    }
+    
+    // INTENTIONAL VULNERABILITY #3: Path Traversal - Unsafe file access
+    @SuppressWarnings("java:S2083")
+    @GetMapping("/export/{filename}")
+    public ResponseEntity<String> exportProductData(@PathVariable String filename) {
+        try {
+            // Vulnerable: User-controlled filename without validation allows directory traversal
+            String filePath = "/tmp/exports/" + filename;
+            File file = new File(filePath);
+            String content = new String(Files.readAllBytes(file.toPath()));
+            return ResponseEntity.ok(content);
+        } catch (IOException e) {
+            // INTENTIONAL VULNERABILITY #4: Information Disclosure - Exposing internal details
+            // Vulnerable: Exposing full exception details and internal file paths to users
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error reading file: " + e.getMessage() + 
+                          "\nStack trace: " + e.getStackTrace()[0].toString());
+        }
     }
 }
