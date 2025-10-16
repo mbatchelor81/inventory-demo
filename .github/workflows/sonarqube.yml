@@ -56,6 +56,7 @@ jobs:
           CI=true npm test -- --coverage --watchAll=false
       
       - name: SonarQube Scan
+        id: sonar-scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -64,3 +65,49 @@ jobs:
             -Dsonar.projectKey=mbatchelor81_inventory-demo \
             -Dsonar.organization=mbatchelor81 \
             -Dsonar.host.url=https://sonarcloud.io
+      
+      - name: SonarQube Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: Get Vulnerability Count
+        id: quality-gate
+        run: |
+          # Get vulnerability count from SonarQube
+          VULNERABILITIES=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=mbatchelor81_inventory-demo&types=VULNERABILITY&resolved=false" \
+            | jq '.total')
+          
+          echo "vulnerability_count=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "📊 Found $VULNERABILITIES vulnerabilities"
+      
+      - name: Trigger Devin Remediation
+        if: steps.quality-gate.outputs.vulnerability_count > 0
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create Devin session for vulnerability remediation
+          DEVIN_SESSION=$(curl -X POST "https://api.devin.ai/v1/sessions" \
+            -H "Authorization: Bearer $DEVIN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "SonarQube Vulnerability Remediation - Run #${{ github.run_number }}",
+              "repo_url": "${{ github.server_url }}/${{ github.repository }}",
+              "branch": "${{ github.ref_name }}",
+              "prompt": "Review the SonarQube scan results for project mbatchelor81_inventory-demo at https://sonarcloud.io/dashboard?id=mbatchelor81_inventory-demo. There are ${{ steps.quality-gate.outputs.vulnerability_count }} vulnerabilities detected.\n\n**IMPORTANT**: You have access to the SonarQube MCP server. Use it to:\n- Query detailed vulnerability information directly from SonarQube\n- Get specific code locations and severity levels\n- Retrieve remediation recommendations from SonarQube\n- Access the full issue context and history\n\nPlease:\n1. Use the SonarQube MCP server to analyze each vulnerability in detail\n2. Review severity levels, affected files, and specific code lines\n3. Fix security vulnerabilities following OWASP best practices\n4. Update dependencies if needed\n5. Ensure all tests pass after fixes\n6. Create a pull request titled: fix: Remediate SonarQube vulnerabilities from scan #${{ github.run_number }}\n\nPR body should include:\n- Number of vulnerabilities addressed: ${{ steps.quality-gate.outputs.vulnerability_count }}\n- List of specific vulnerabilities fixed (with SonarQube issue keys)\n- SonarQube Report: https://sonarcloud.io/dashboard?id=mbatchelor81_inventory-demo\n- GitHub Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\nFocus on:\n- SQL injection vulnerabilities\n- XSS vulnerabilities\n- Authentication/authorization issues\n- Insecure dependencies\n- Code quality issues that could lead to security problems"
+            }')
+          
+          SESSION_ID=$(echo $DEVIN_SESSION | jq -r '.session_id')
+          SESSION_URL=$(echo $DEVIN_SESSION | jq -r '.url')
+          
+          echo "✅ Devin session created: $SESSION_URL"
+          echo "Session ID: $SESSION_ID"
+          
+          # Post comment to PR if this is a pull request
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            gh pr comment ${{ github.event.pull_request.number }} \
+              --body "🤖 **Devin AI Remediation Triggered**\n\n${{ steps.quality-gate.outputs.vulnerability_count }} vulnerabilities detected by SonarQube.\n\nDevin is working on fixes: [$SESSION_URL]($SESSION_URL)\n\n[View SonarQube Report](https://sonarcloud.io/dashboard?id=mbatchelor81_inventory-demo)"
+          fi
