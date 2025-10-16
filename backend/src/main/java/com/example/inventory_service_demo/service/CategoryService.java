@@ -17,6 +17,8 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
+    private static final String CATEGORY_NOT_FOUND_MESSAGE = "Category not found with id: ";
+
     @Autowired
     public CategoryService(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
@@ -48,12 +50,11 @@ public class CategoryService {
     @Transactional
     public Category updateCategory(Long id, Category categoryDetails) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(CATEGORY_NOT_FOUND_MESSAGE + id));
 
-        if (!category.getName().equals(categoryDetails.getName())) {
-            if (categoryRepository.findByName(categoryDetails.getName()).isPresent()) {
-                throw new IllegalArgumentException("Category with name '" + categoryDetails.getName() + "' already exists");
-            }
+        if (!category.getName().equals(categoryDetails.getName()) && 
+            categoryRepository.findByName(categoryDetails.getName()).isPresent()) {
+            throw new IllegalArgumentException("Category with name '" + categoryDetails.getName() + "' already exists");
         }
         
         if (categoryDetails.getParentCategoryId() != null) {
@@ -72,7 +73,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(CATEGORY_NOT_FOUND_MESSAGE + id));
         
         List<Product> productsInCategory = productRepository.findByCategoryId(id);
         if (!productsInCategory.isEmpty()) {
@@ -99,7 +100,7 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
         
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + categoryId));
+                .orElseThrow(() -> new IllegalArgumentException(CATEGORY_NOT_FOUND_MESSAGE + categoryId));
         
         product.setCategory(category);
         return productRepository.save(product);
