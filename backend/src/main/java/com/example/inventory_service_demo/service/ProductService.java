@@ -61,4 +61,9 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
         productRepository.delete(product);
     }
+    
+    // INTENTIONAL VULNERABILITY: Exposes SQL injection vulnerability
+    public List<Product> searchProducts(String searchTerm) {
+        return productRepository.searchProductsByName(searchTerm);
+    }
 }

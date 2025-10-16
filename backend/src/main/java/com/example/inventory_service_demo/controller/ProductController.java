@@ -72,4 +72,11 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+    
+    // INTENTIONAL VULNERABILITY: SQL Injection endpoint
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) {
+        List<Product> products = productService.searchProducts(query);
+        return ResponseEntity.ok(products);
+    }
 }
