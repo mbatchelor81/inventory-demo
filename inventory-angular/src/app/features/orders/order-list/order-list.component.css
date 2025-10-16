@@ -1,0 +1,165 @@
+.order-list {
+  width: 100%;
+}
+
+.order-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.order-list-header h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.order-list-controls {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 20px 12px 45px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.filter-box select {
+  padding: 12px 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+}
+
+.order-table-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table thead {
+  background-color: #f8f9fa;
+}
+
+.order-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.order-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.order-id {
+  font-weight: 600;
+  color: #4361ee;
+}
+
+.customer-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.customer-email {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-badge.status-created {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-badge.status-processing {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.no-orders {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.no-orders i {
+  font-size: 48px;
+  color: #ced4da;
+  margin-bottom: 20px;
+}
+
+.no-orders h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.no-orders p {
+  margin: 0 0 20px 0;
+  color: #6c757d;
+}
+
+.loading, .error-message {
+  background: white;
+  border-radius: 10px;
+  padding: 60px 30px;
+  text-align: center;
+}
