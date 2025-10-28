@@ -244,4 +244,34 @@ class ProductServiceTest {
         assertFalse(result.isPresent());
         verify(productRepository, times(1)).findBySku("NONEXISTENT");
     }
+    @Test
+    void testSearchProducts_WithValidSearchTerm_ReturnsMatchingProducts() {
+        Product product1 = createSampleProductWithId(1L);
+        product1.setName("Laptop Computer");
+        Product product2 = createSampleProductWithId(2L);
+        product2.setName("Desktop Computer");
+        
+        List<Product> expectedProducts = Arrays.asList(product1, product2);
+        when(productRepository.searchByName("Computer")).thenReturn(expectedProducts);
+
+        List<Product> result = productService.searchProducts("Computer");
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Laptop Computer", result.get(0).getName());
+        assertEquals("Desktop Computer", result.get(1).getName());
+        verify(productRepository, times(1)).searchByName("Computer");
+    }
+
+    @Test
+    void testSearchProducts_WithNoMatches_ReturnsEmptyList() {
+        when(productRepository.searchByName("NonexistentProduct")).thenReturn(Arrays.asList());
+
+        List<Product> result = productService.searchProducts("NonexistentProduct");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(productRepository, times(1)).searchByName("NonexistentProduct");
+    }
+
 }
