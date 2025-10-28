@@ -2,8 +2,6 @@ package com.example.inventory_service_demo.service;
 
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.repository.ProductRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +15,6 @@ import java.util.Random;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -70,12 +65,8 @@ public class ProductService {
         productRepository.delete(product);
     }
     
-    // INTENTIONAL VULNERABILITY: SQL Injection via string concatenation
-    @SuppressWarnings("unchecked")
     public List<Product> searchProducts(String searchTerm) {
-        // Vulnerable: User input directly concatenated into SQL query
-        String sql = "SELECT * FROM product WHERE name LIKE '%" + searchTerm + "%'";
-        return entityManager.createNativeQuery(sql, Product.class).getResultList();
+        return productRepository.searchByName(searchTerm);
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
