@@ -3,8 +3,6 @@ package com.example.inventory_service_demo.service;
 import com.example.inventory_service_demo.exception.HashGenerationException;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.repository.ProductRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +17,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final SecureRandom secureRandom = new SecureRandom();
-    
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -72,13 +67,8 @@ public class ProductService {
         productRepository.delete(product);
     }
     
-    // Fixed: Using parameterized query to prevent SQL injection
-    @SuppressWarnings("unchecked")
     public List<Product> searchProducts(String searchTerm) {
-        String sql = "SELECT * FROM product WHERE name LIKE :searchTerm";
-        return entityManager.createNativeQuery(sql, Product.class)
-                .setParameter("searchTerm", "%" + searchTerm + "%")
-                .getResultList();
+        return productRepository.findByNameContainingIgnoreCase(searchTerm);
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
