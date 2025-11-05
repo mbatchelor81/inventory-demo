@@ -99,7 +99,7 @@ jobs:
           echo "📊 Extracting vulnerability details from SonarQube..."
           
           VULN_RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
-            "https://sonarcloud.io/api/issues/search?componentKeys=mbatchelor81_inventory-demo&types=VULNERABILITY&resolved=false&ps=50")
+            "https://sonarcloud.io/api/issues/search?componentKeys=mbatchelor81_inventory-demo&pullRequest=${{ github.event.pull_request.number }}&types=VULNERABILITY&resolved=false&ps=50")
           
           VULN_COUNT=$(echo "$VULN_RESPONSE" | jq '.total')
           VULN_DETAILS=$(echo "$VULN_RESPONSE" | jq -c '{total: .total, issues: [.issues[] | {key: .key, severity: .severity, message: .message, component: .component, line: .line, type: .type}]}')

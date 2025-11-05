@@ -48,4 +48,14 @@ class ProductServiceTest {
         assertEquals(11, code.length());
     }
 
+    @Test
+    void testGenerateProductHashReturnsValidMD5Hash() {
+        String input = "test-product-123";
+        String hash = productService.generateProductHash(input);
+        
+        assertNotNull(hash);
+        assertEquals(32, hash.length());
+        assertTrue(hash.matches("[0-9a-f]{32}"));
+    }
+
 }
