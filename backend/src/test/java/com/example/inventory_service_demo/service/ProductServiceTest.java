@@ -38,4 +38,14 @@ class ProductServiceTest {
         assertNotNull(results);
         assertTrue(results.stream().anyMatch(p -> p.getName().contains("Laptop")));
     }
+
+    @Test
+    void testGenerateProductCodeReturnsFormattedCode() {
+        String code = productService.generateProductCode();
+        
+        assertNotNull(code);
+        assertTrue(code.startsWith("PROD-"));
+        assertEquals(11, code.length());
+    }
+
 }
