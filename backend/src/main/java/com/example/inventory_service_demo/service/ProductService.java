@@ -1,5 +1,6 @@
 package com.example.inventory_service_demo.service;
 
+import com.example.inventory_service_demo.exception.HashGenerationException;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
@@ -11,12 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final SecureRandom secureRandom = new SecureRandom();
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -70,12 +72,13 @@ public class ProductService {
         productRepository.delete(product);
     }
     
-    // INTENTIONAL VULNERABILITY: SQL Injection via string concatenation
+    // Fixed: Using parameterized query to prevent SQL injection
     @SuppressWarnings("unchecked")
     public List<Product> searchProducts(String searchTerm) {
-        // Vulnerable: User input directly concatenated into SQL query
-        String sql = "SELECT * FROM product WHERE name LIKE '%" + searchTerm + "%'";
-        return entityManager.createNativeQuery(sql, Product.class).getResultList();
+        String sql = "SELECT * FROM product WHERE name LIKE :searchTerm";
+        return entityManager.createNativeQuery(sql, Product.class)
+                .setParameter("searchTerm", "%" + searchTerm + "%")
+                .getResultList();
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
@@ -93,16 +96,13 @@ public class ProductService {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
+            throw new HashGenerationException("MD5 algorithm not found", e);
         }
     }
     
-    // INTENTIONAL VULNERABILITY #5: Insecure Random - Using predictable Random
-    @SuppressWarnings("java:S2245")
+    // Fixed: Using SecureRandom as a reusable instance for cryptographically secure random numbers
     public String generateProductCode() {
-        // Vulnerable: java.util.Random is predictable and not cryptographically secure
-        Random random = new Random();
-        int code = random.nextInt(999999);
+        int code = secureRandom.nextInt(999999);
         return String.format("PROD-%06d", code);
     }
 }
