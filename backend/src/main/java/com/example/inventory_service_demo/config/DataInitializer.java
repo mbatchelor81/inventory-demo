@@ -1,8 +1,10 @@
 package com.example.inventory_service_demo.config;
 
+import com.example.inventory_service_demo.model.Category;
 import com.example.inventory_service_demo.model.OrderItem;
 import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.model.PurchaseOrder;
+import com.example.inventory_service_demo.repository.CategoryRepository;
 import com.example.inventory_service_demo.repository.PurchaseOrderRepository;
 import com.example.inventory_service_demo.service.InventoryService;
 import com.example.inventory_service_demo.service.ProductService;
@@ -22,15 +24,18 @@ public class DataInitializer implements CommandLineRunner {
     private final ProductService productService;
     private final InventoryService inventoryService;
     private final PurchaseOrderRepository purchaseOrderRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
     public DataInitializer(
             ProductService productService, 
             InventoryService inventoryService,
-            PurchaseOrderRepository purchaseOrderRepository) {
+            PurchaseOrderRepository purchaseOrderRepository,
+            CategoryRepository categoryRepository) {
         this.productService = productService;
         this.inventoryService = inventoryService;
         this.purchaseOrderRepository = purchaseOrderRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -42,13 +47,21 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void loadSampleData() {
-        // Create sample products
+        Category electronics = new Category("Electronics", "Electronic devices and gadgets");
+        Category accessories = new Category("Accessories", "Product accessories and add-ons");
+        Category computing = new Category("Computing", "Computers and computing devices");
+        
+        Category savedElectronics = categoryRepository.save(electronics);
+        Category savedAccessories = categoryRepository.save(accessories);
+        Category savedComputing = categoryRepository.save(computing);
+
         Product laptop = new Product(
                 "Laptop Pro X1",
                 "High-performance laptop with 16GB RAM and 512GB SSD",
                 "LP-X1-2025",
                 new BigDecimal("1299.99")
         );
+        laptop.setCategory(savedComputing);
         
         Product smartphone = new Product(
                 "SmartPhone Galaxy",
@@ -56,6 +69,7 @@ public class DataInitializer implements CommandLineRunner {
                 "SP-G-2025",
                 new BigDecimal("899.99")
         );
+        smartphone.setCategory(savedElectronics);
         
         Product headphones = new Product(
                 "Noise Cancelling Headphones",
@@ -63,6 +77,7 @@ public class DataInitializer implements CommandLineRunner {
                 "NC-HP-2025",
                 new BigDecimal("249.99")
         );
+        headphones.setCategory(savedAccessories);
         
         Product tablet = new Product(
                 "Tablet Air",
@@ -70,6 +85,7 @@ public class DataInitializer implements CommandLineRunner {
                 "TA-10-2025",
                 new BigDecimal("499.99")
         );
+        tablet.setCategory(savedComputing);
         
         Product smartwatch = new Product(
                 "Fitness Watch Pro",
@@ -77,8 +93,8 @@ public class DataInitializer implements CommandLineRunner {
                 "FW-P-2025",
                 new BigDecimal("199.99")
         );
+        smartwatch.setCategory(savedAccessories);
 
-        // Save products
         Product savedLaptop = productService.createProduct(laptop);
         Product savedSmartphone = productService.createProduct(smartphone);
         Product savedHeadphones = productService.createProduct(headphones);
