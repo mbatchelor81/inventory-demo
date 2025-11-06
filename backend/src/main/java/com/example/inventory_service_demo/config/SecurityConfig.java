@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Security configuration for the Inventory Service Demo.
@@ -19,6 +20,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_USER = "USER";
+    private static final String ROLE_SERVICE = "SERVICE";
+    
+    @Value("${security.admin.password}")
+    private String adminPassword;
+    
+    @Value("${security.user.password}")
+    private String userPassword;
+    
+    @Value("${security.service.password}")
+    private String servicePassword;
     
     /**
      * INTENTIONAL VULNERABILITY: Hardcoded Credentials
@@ -33,25 +47,22 @@ public class SecurityConfig {
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        // VULNERABILITY: Hardcoded admin credentials
         UserDetails admin = User.builder()
             .username("admin")
-            .password(passwordEncoder().encode("admin123"))  // BLOCKER: Hardcoded password
-            .roles("ADMIN")
+            .password(passwordEncoder().encode(adminPassword))
+            .roles(ROLE_ADMIN)
             .build();
         
-        // VULNERABILITY: Hardcoded user credentials
         UserDetails user = User.builder()
             .username("user")
-            .password(passwordEncoder().encode("password123"))  // BLOCKER: Hardcoded password
-            .roles("USER")
+            .password(passwordEncoder().encode(userPassword))
+            .roles(ROLE_USER)
             .build();
         
-        // VULNERABILITY: Hardcoded API service account
         UserDetails apiService = User.builder()
             .username("api-service")
-            .password(passwordEncoder().encode("SuperSecret2024!"))  // BLOCKER: Hardcoded password
-            .roles("SERVICE")
+            .password(passwordEncoder().encode(servicePassword))
+            .roles(ROLE_SERVICE)
             .build();
         
         return new InMemoryUserDetailsManager(admin, user, apiService);
@@ -72,11 +83,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // Disabled for demo purposes
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/service/**").hasRole("SERVICE")
-                .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "SERVICE")
+                .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
+                .requestMatchers("/api/service/**").hasRole(ROLE_SERVICE)
+                .requestMatchers("/api/**").hasAnyRole(ROLE_USER, ROLE_ADMIN, ROLE_SERVICE)
                 .anyRequest().permitAll()
             )
             .httpBasic(basic -> {});
