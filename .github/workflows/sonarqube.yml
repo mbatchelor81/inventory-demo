@@ -224,7 +224,7 @@ jobs:
           - Testing edge cases, error paths, and business logic
           
           **Tools & Access:**
-          - You have access to the SonarQube MCP server to query detailed issue information
+          - You have access to the SonarQube MCP server and SONAR_TOKEN for direct REST API access to query detailed issue information
           - Use the MCP server to get comprehensive details about ALL issues, not just vulnerabilities
           - Query for quality gate status, failed conditions, and coverage metrics
           
@@ -258,9 +258,9 @@ jobs:
 
           ## Your Mission
 
-          ### Phase 1: Comprehensive Analysis (Use SonarQube MCP Server)
+          ### Phase 1: Comprehensive Analysis (Use SonarQube MCP Server or SONAR_TOKEN for REST API Access)
           
-          **CRITICAL:** Use the SonarQube MCP server to analyze ALL aspects of the quality gate failure:
+          **CRITICAL:** Use the SonarQube MCP server or SONAR_TOKEN for REST API access to analyze ALL aspects of the quality gate failure:
           
           1. **Query the quality gate status** to understand which specific conditions failed:
              - New reliability rating (bugs)
