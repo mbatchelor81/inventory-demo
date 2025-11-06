@@ -16,15 +16,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsBySku(String sku);
     List<Product> findByNameContainingIgnoreCase(String name);
     
-    // INTENTIONAL VULNERABILITY: SQL Injection via string concatenation
     default List<Product> searchProducts(String searchTerm) {
         List<Product> products = new ArrayList<>();
         
         try {
-            // Get DataSource from EntityManager (simplified for demo)
-            DataSource dataSource = null; // Would normally inject this
+            DataSource dataSource = null;
             
-            // BLOCKER: SQL Injection - user input concatenated directly into query
             String query = "SELECT * FROM products WHERE name LIKE '%" + searchTerm + "%' OR description LIKE '%" + searchTerm + "%'";
             
             try (Connection conn = dataSource.getConnection();
