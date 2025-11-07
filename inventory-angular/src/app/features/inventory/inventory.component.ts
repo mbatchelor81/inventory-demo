@@ -5,7 +5,8 @@ import { Inventory } from '../../core/models/inventory';
 @Component({
   selector: 'app-inventory',
   templateUrl: './inventory.component.html',
-  styleUrls: ['./inventory.component.css']
+  styleUrls: ['./inventory.component.css'],
+  standalone: false
 })
 export class InventoryComponent implements OnInit {
   inventoryItems: Inventory[] = [];

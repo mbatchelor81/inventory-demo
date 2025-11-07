@@ -6,7 +6,8 @@ import { ApiService } from '../../../core/services/api.service';
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.css']
+  styleUrls: ['./product-form.component.css'],
+  standalone: false
 })
 export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
