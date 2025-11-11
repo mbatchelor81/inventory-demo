@@ -4,24 +4,31 @@ import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final Path exportsBase;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, 
+                           @Value("${app.exports.dir}") String exportsDir) {
         this.productService = productService;
+        this.exportsBase = Paths.get(exportsDir);
     }
 
     @GetMapping
@@ -86,7 +93,6 @@ public class ProductController {
     @GetMapping("/export/{filename}")
     public ResponseEntity<String> exportProductData(@PathVariable String filename) {
         try {
-            // Validate filename to prevent directory traversal
             if (filename == null || filename.isEmpty()) {
                 return ResponseEntity.badRequest().body("Filename cannot be empty");
             }
@@ -99,20 +105,20 @@ public class ProductController {
                 return ResponseEntity.badRequest().body("Filename contains invalid characters");
             }
             
-            File exportsDir = new File("/tmp/exports/");
-            File file = new File(exportsDir, filename);
+            Path candidate = exportsBase.resolve(filename).normalize();
             
-            String canonicalPath = file.getCanonicalPath();
-            String canonicalExportsPath = exportsDir.getCanonicalPath();
-            if (!canonicalPath.startsWith(canonicalExportsPath + File.separator)) {
-                return ResponseEntity.badRequest().body("Access denied");
-            }
-            
-            if (!file.exists() || !file.isFile()) {
+            if (!Files.exists(candidate) || !Files.isRegularFile(candidate)) {
                 return ResponseEntity.notFound().build();
             }
             
-            String content = new String(Files.readAllBytes(file.toPath()));
+            Path baseReal = exportsBase.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            Path candidateReal = candidate.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            
+            if (!candidateReal.startsWith(baseReal)) {
+                return ResponseEntity.badRequest().body("Access denied");
+            }
+            
+            String content = Files.readString(candidateReal, StandardCharsets.UTF_8);
             return ResponseEntity.ok(content);
         } catch (IOException e) {
             // FIXED: Information Disclosure - Generic error message without internal details
