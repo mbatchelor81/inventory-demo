@@ -7,6 +7,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -83,5 +84,25 @@ class ProductControllerTest {
     void exportProductData_withEmptyFilename_returnsBadRequest() throws Exception {
         mockMvc.perform(get("/api/products/export/"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void exportProductData_directCall_withNullFilename_returnsBadRequest() {
+        ProductController controller = new ProductController(productService, tempExportDir.toString());
+        
+        ResponseEntity<String> response = controller.exportProductData(null);
+        
+        assert response.getStatusCode().value() == 400;
+        assert "Filename cannot be empty".equals(response.getBody());
+    }
+
+    @Test
+    void exportProductData_directCall_withForwardSlashInFilename_returnsBadRequest() {
+        ProductController controller = new ProductController(productService, tempExportDir.toString());
+        
+        ResponseEntity<String> response = controller.exportProductData("etc/passwd");
+        
+        assert response.getStatusCode().value() == 400;
+        assert "Invalid filename".equals(response.getBody());
     }
 }
