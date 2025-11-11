@@ -83,22 +83,41 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     
-    // INTENTIONAL VULNERABILITY #3: Path Traversal - Unsafe file access
-    @SuppressWarnings("java:S2083")
     @GetMapping("/export/{filename}")
     public ResponseEntity<String> exportProductData(@PathVariable String filename) {
         try {
-            // Vulnerable: User-controlled filename without validation allows directory traversal
-            String filePath = "/tmp/exports/" + filename;
-            File file = new File(filePath);
+            // Validate filename to prevent directory traversal
+            if (filename == null || filename.isEmpty()) {
+                return ResponseEntity.badRequest().body("Filename cannot be empty");
+            }
+            
+            if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+                return ResponseEntity.badRequest().body("Invalid filename");
+            }
+            
+            if (!filename.matches("^[a-zA-Z0-9._-]+$")) {
+                return ResponseEntity.badRequest().body("Filename contains invalid characters");
+            }
+            
+            File exportsDir = new File("/tmp/exports/");
+            File file = new File(exportsDir, filename);
+            
+            String canonicalPath = file.getCanonicalPath();
+            String canonicalExportsPath = exportsDir.getCanonicalPath();
+            if (!canonicalPath.startsWith(canonicalExportsPath + File.separator)) {
+                return ResponseEntity.badRequest().body("Access denied");
+            }
+            
+            if (!file.exists() || !file.isFile()) {
+                return ResponseEntity.notFound().build();
+            }
+            
             String content = new String(Files.readAllBytes(file.toPath()));
             return ResponseEntity.ok(content);
         } catch (IOException e) {
-            // INTENTIONAL VULNERABILITY #4: Information Disclosure - Exposing internal details
-            // Vulnerable: Exposing full exception details and internal file paths to users
+            // FIXED: Information Disclosure - Generic error message without internal details
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error reading file: " + e.getMessage() + 
-                          "\nStack trace: " + e.getStackTrace()[0].toString());
+                    .body("Error reading file");
         }
     }
 }
