@@ -4,24 +4,31 @@ import com.example.inventory_service_demo.model.Product;
 import com.example.inventory_service_demo.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final Path exportsBase;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, 
+                           @Value("${app.exports.dir}") String exportsDir) {
         this.productService = productService;
+        this.exportsBase = Paths.get(exportsDir);
     }
 
     @GetMapping
@@ -83,22 +90,40 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     
-    // INTENTIONAL VULNERABILITY #3: Path Traversal - Unsafe file access
-    @SuppressWarnings("java:S2083")
     @GetMapping("/export/{filename}")
     public ResponseEntity<String> exportProductData(@PathVariable String filename) {
         try {
-            // Vulnerable: User-controlled filename without validation allows directory traversal
-            String filePath = "/tmp/exports/" + filename;
-            File file = new File(filePath);
-            String content = new String(Files.readAllBytes(file.toPath()));
+            if (filename == null || filename.isEmpty()) {
+                return ResponseEntity.badRequest().body("Filename cannot be empty");
+            }
+            
+            if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+                return ResponseEntity.badRequest().body("Invalid filename");
+            }
+            
+            if (!filename.matches("^[a-zA-Z0-9._-]+$")) {
+                return ResponseEntity.badRequest().body("Filename contains invalid characters");
+            }
+            
+            Path candidate = exportsBase.resolve(filename).normalize();
+            
+            if (!Files.exists(candidate) || !Files.isRegularFile(candidate)) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Path baseReal = exportsBase.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            Path candidateReal = candidate.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            
+            if (!candidateReal.startsWith(baseReal)) {
+                return ResponseEntity.badRequest().body("Access denied");
+            }
+            
+            String content = Files.readString(candidateReal, StandardCharsets.UTF_8);
             return ResponseEntity.ok(content);
         } catch (IOException e) {
-            // INTENTIONAL VULNERABILITY #4: Information Disclosure - Exposing internal details
-            // Vulnerable: Exposing full exception details and internal file paths to users
+            // FIXED: Information Disclosure - Generic error message without internal details
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error reading file: " + e.getMessage() + 
-                          "\nStack trace: " + e.getStackTrace()[0].toString());
+                    .body("Error reading file");
         }
     }
 }
