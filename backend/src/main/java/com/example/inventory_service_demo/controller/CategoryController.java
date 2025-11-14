@@ -43,33 +43,54 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
-        try {
-            Category createdCategory = categoryService.createCategory(category);
-            return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return handleServiceCall(
+            () -> categoryService.createCategory(category),
+            HttpStatus.CREATED,
+            HttpStatus.BAD_REQUEST
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody Category category) {
-        try {
-            Category updatedCategory = categoryService.updateCategory(id, category);
-            return ResponseEntity.ok(updatedCategory);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return handleServiceCall(
+            () -> categoryService.updateCategory(id, category),
+            HttpStatus.OK,
+            HttpStatus.NOT_FOUND
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        return handleServiceCallVoid(
+            () -> categoryService.deleteCategory(id),
+            HttpStatus.NO_CONTENT,
+            HttpStatus.NOT_FOUND
+        );
+    }
+
+    private <T> ResponseEntity<T> handleServiceCall(
+            java.util.function.Supplier<T> serviceCall,
+            HttpStatus successStatus,
+            HttpStatus errorStatus) {
         try {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.noContent().build();
+            T result = serviceCall.get();
+            return new ResponseEntity<>(result, successStatus);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(errorStatus);
+        }
+    }
+
+    private ResponseEntity<Void> handleServiceCallVoid(
+            Runnable serviceCall,
+            HttpStatus successStatus,
+            HttpStatus errorStatus) {
+        try {
+            serviceCall.run();
+            return new ResponseEntity<>(successStatus);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(errorStatus);
         }
     }
 }

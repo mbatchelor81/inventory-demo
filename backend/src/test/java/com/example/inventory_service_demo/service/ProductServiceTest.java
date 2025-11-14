@@ -1,6 +1,8 @@
 package com.example.inventory_service_demo.service;
 
+import com.example.inventory_service_demo.model.Category;
 import com.example.inventory_service_demo.model.Product;
+import com.example.inventory_service_demo.repository.CategoryRepository;
 import com.example.inventory_service_demo.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ class ProductServiceTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Test
     void testSearchProductsReturnsMatchingProducts() {
@@ -56,6 +61,39 @@ class ProductServiceTest {
         assertNotNull(hash);
         assertEquals(32, hash.length());
         assertTrue(hash.matches("[0-9a-f]{32}"));
+    }
+
+    @Test
+    void testGetProductsByCategoryReturnsMatchingProducts() {
+        Category category = new Category("Test Category", "Test Description");
+        Category savedCategory = categoryRepository.save(category);
+        final Long categoryId = savedCategory.getId();
+
+        Product product1 = new Product();
+        product1.setName("Test Product 1");
+        product1.setSku("TEST-PROD-001");
+        product1.setPrice(new BigDecimal("99.99"));
+        product1.setCategory(savedCategory);
+        productRepository.save(product1);
+
+        Product product2 = new Product();
+        product2.setName("Test Product 2");
+        product2.setSku("TEST-PROD-002");
+        product2.setPrice(new BigDecimal("149.99"));
+        product2.setCategory(savedCategory);
+        productRepository.save(product2);
+
+        Product product3 = new Product();
+        product3.setName("Test Product 3");
+        product3.setSku("TEST-PROD-003");
+        product3.setPrice(new BigDecimal("199.99"));
+        productRepository.save(product3);
+
+        List<Product> results = productService.getProductsByCategory(categoryId);
+        
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().allMatch(p -> p.getCategory() != null && p.getCategory().getId().equals(categoryId)));
     }
 
 }
