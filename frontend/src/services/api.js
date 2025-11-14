@@ -188,3 +188,65 @@ export const getOrdersByStatus = async (status) => {
     throw error;
   }
 };
+
+export const getAllCategories = async () => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/categories`);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+};
+
+export const getCategoryById = async (id) => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/categories/${id}`);
+  } catch (error) {
+    console.error(`Error fetching category with id ${id}:`, error);
+    throw error;
+  }
+};
+
+export const createCategory = async (categoryData) => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/categories`, {
+      method: 'POST',
+      body: JSON.stringify(categoryData),
+    });
+  } catch (error) {
+    console.error('Error creating category:', error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (id, categoryData) => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(categoryData),
+    });
+  } catch (error) {
+    console.error(`Error updating category with id ${id}:`, error);
+    throw error;
+  }
+};
+
+export const deleteCategory = async (id) => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/categories/${id}`, {
+      method: 'DELETE',
+    });
+  } catch (error) {
+    console.error(`Error deleting category with id ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getProductsByCategory = async (categoryId) => {
+  try {
+    return await fetchWithAuth(`${API_BASE_URL}/products/category/${categoryId}`);
+  } catch (error) {
+    console.error(`Error fetching products for category id ${categoryId}:`, error);
+    throw error;
+  }
+};

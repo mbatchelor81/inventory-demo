@@ -1,6 +1,7 @@
 package com.example.inventory_service_demo.repository;
 
 import com.example.inventory_service_demo.model.Product;
+import com.example.inventory_service_demo.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySku(String sku);
     boolean existsBySku(String sku);
     List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByCategory(Category category);
+    List<Product> findByCategoryId(Long categoryId);
 }

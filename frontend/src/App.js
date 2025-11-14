@@ -7,6 +7,7 @@ import ProductForm from './components/products/ProductForm';
 import InventoryList from './components/inventory/InventoryList';
 import OrderList from './components/orders/OrderList';
 import OrderForm from './components/orders/OrderForm';
+import CategoryList from './components/categories/CategoryList';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/inventory" element={<InventoryList />} />
           <Route path="/orders" element={<OrderList />} />
           <Route path="/orders/new" element={<OrderForm />} />
+          <Route path="/categories" element={<CategoryList />} />
         </Routes>
       </Layout>
     </Router>

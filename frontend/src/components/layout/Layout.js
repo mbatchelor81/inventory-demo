@@ -55,6 +55,15 @@ const Layout = ({ children }) => {
                 <span>Orders</span>
               </Link>
             </li>
+            <li>
+              <Link 
+                to="/categories" 
+                className={isActive('/categories') ? 'active' : ''}
+              >
+                <i className="fas fa-tags"></i>
+                <span>Categories</span>
+              </Link>
+            </li>
           </ul>
         </nav>
 
