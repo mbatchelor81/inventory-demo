@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -29,16 +30,12 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return okOrNotFound(categoryService.getCategoryById(id));
     }
 
     @GetMapping("/name/{name}")
     public ResponseEntity<Category> getCategoryByName(@PathVariable String name) {
-        return categoryService.getCategoryByName(name)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return okOrNotFound(categoryService.getCategoryByName(name));
     }
 
     @PostMapping
@@ -92,5 +89,10 @@ public class CategoryController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(errorStatus);
         }
+    }
+
+    private static <T> ResponseEntity<T> okOrNotFound(Optional<T> optional) {
+        return optional.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
