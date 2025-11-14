@@ -73,6 +73,10 @@ public class ProductService {
         return productRepository.findByNameContainingIgnoreCase(searchTerm);
     }
     
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
+    
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
     @SuppressWarnings("java:S4790")
     public String generateProductHash(String productData) {
