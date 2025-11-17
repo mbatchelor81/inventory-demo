@@ -177,10 +177,7 @@ jobs:
       
       - name: Trigger Devin Remediation (Human PR Only)
         id: trigger-devin
-        if: |
-          steps.quality-gate.outcome == 'failure' && 
-          steps.check-devin.outputs.is_devin_commit == 'false' &&
-          github.event_name == 'pull_request'
+        if: false
         env:
           DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
