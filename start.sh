@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Inventory Service Demo Startup Script
-# This script starts both the backend (Spring Boot) and frontend (React) services
+# This script starts both the backend (Spring Boot) and frontend (Angular) services
 
 set -e  # Exit on any error
 
@@ -36,7 +36,7 @@ trap cleanup SIGINT SIGTERM EXIT
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR/backend"
-FRONTEND_DIR="$SCRIPT_DIR/frontend"
+FRONTEND_DIR="$SCRIPT_DIR/angular-frontend"
 LOGS_DIR="$SCRIPT_DIR/logs"
 
 # Create logs directory if it doesn't exist
@@ -53,19 +53,19 @@ if [ ! -d "$FRONTEND_DIR" ]; then
     exit 1
 fi
 
-# Kill any existing processes on ports 8080 and 3000
-echo -e "${YELLOW}Checking for existing processes on ports 8080 and 3000...${NC}"
+# Kill any existing processes on ports 8080 and 4200
+echo -e "${YELLOW}Checking for existing processes on ports 8080 and 4200...${NC}"
 EXISTING_8080=$(lsof -ti:8080 2>/dev/null || true)
-EXISTING_3000=$(lsof -ti:3000 2>/dev/null || true)
+EXISTING_4200=$(lsof -ti:4200 2>/dev/null || true)
 
 if [ ! -z "$EXISTING_8080" ]; then
     echo "Killing existing process on port 8080 (PID: $EXISTING_8080)"
     kill -9 $EXISTING_8080 2>/dev/null || true
 fi
 
-if [ ! -z "$EXISTING_3000" ]; then
-    echo "Killing existing processes on port 3000 (PIDs: $EXISTING_3000)"
-    kill -9 $EXISTING_3000 2>/dev/null || true
+if [ ! -z "$EXISTING_4200" ]; then
+    echo "Killing existing processes on port 4200 (PIDs: $EXISTING_4200)"
+    kill -9 $EXISTING_4200 2>/dev/null || true
 fi
 
 # Start backend
@@ -100,7 +100,7 @@ for i in {1..30}; do
 done
 
 # Start frontend
-echo -e "${BLUE}Starting frontend (React)...${NC}"
+echo -e "${BLUE}Starting frontend (Angular)...${NC}"
 cd "$FRONTEND_DIR"
 npm start > "$LOGS_DIR/frontend.log" 2>&1 &
 FRONTEND_PID=$!
@@ -119,7 +119,7 @@ fi
 # Test frontend health
 echo "Testing frontend health..."
 for i in {1..30}; do
-    if curl -s http://localhost:3000 > /dev/null 2>&1; then
+    if curl -s http://localhost:4200 > /dev/null 2>&1; then
         echo -e "${GREEN}Frontend is healthy!${NC}"
         break
     fi
@@ -132,7 +132,7 @@ done
 
 echo -e "${GREEN}✅ Both services are running successfully!${NC}"
 echo "=================================="
-echo -e "${GREEN}🌐 Frontend: http://localhost:3000${NC}"
+echo -e "${GREEN}🌐 Frontend: http://localhost:4200${NC}"
 echo -e "${GREEN}🔧 Backend:  http://localhost:8080${NC}"
 echo -e "${GREEN}📊 Backend Health: http://localhost:8080/actuator/health${NC}"
 echo "=================================="

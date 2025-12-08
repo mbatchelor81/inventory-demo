@@ -1,16 +1,16 @@
 # Frontend Setup
 
-This project uses React for the frontend. Follow these steps to get started.
+This project uses Angular for the frontend. Follow these steps to get started.
 
 ## Prerequisites
-- Node.js (v14 or later)
-- npm (v6 or later)
+- Node.js (v16 or later)
+- npm (v8 or later)
 
 ## Getting Started
 
 1. **Install Dependencies**
    ```bash
-   cd frontend
+   cd angular-frontend
    npm install
    ```
 
@@ -18,33 +18,27 @@ This project uses React for the frontend. Follow these steps to get started.
    ```bash
    npm start
    ```
-   The app will be available at [http://localhost:3000](http://localhost:3000)
-   
-   If port 3000 is in use, you can specify a different port:
-   ```bash
-   PORT=3001 npm start
-   ```
+   The app will be available at [http://localhost:4200](http://localhost:4200)
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the angular-frontend directory, you can run:
 
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
+- `npm start` - Runs the app in development mode (ng serve)
+- `npm test` - Launches the test runner (Karma)
 - `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (use with caution)
+- `npm run watch` - Builds and watches for changes in development mode
 
 ## Project Structure
 
-- `/public` - Static files
 - `/src` - Source code
-  - `/components` - Reusable React components
-  - `/pages` - Page components
-  - `/services` - API services
-  - `/utils` - Utility functions
+  - `/app` - Angular application code
+    - `/components` - Reusable Angular components
+    - `/services` - API services
+    - `/models` - TypeScript interfaces and models
+  - `/assets` - Static assets
+  - `/environments` - Environment configuration
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+You can learn more in the [Angular documentation](https://angular.io/docs).

@@ -1,9 +1,0 @@
-{
-  "short_name": "Inventory Service",
-  "name": "Inventory Management System",
-  "icons": [],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
-}
