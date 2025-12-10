@@ -68,9 +68,7 @@ public class ProductService {
     }
     
     public List<Product> searchProducts(String searchTerm) {
-        // Uses Spring Data JPA derived query method for safe parameterization
-        // This prevents SQL injection by automatically handling parameter binding
-        return productRepository.findByNameContainingIgnoreCase(searchTerm);
+        return productRepository.searchByNameOrDescription(searchTerm);
     }
     
     // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
