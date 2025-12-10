@@ -73,11 +73,9 @@ public class ProductService {
         return productRepository.findByNameContainingIgnoreCase(searchTerm);
     }
     
-    // INTENTIONAL VULNERABILITY #2: Weak Cryptography - Using MD5 for hashing
     @SuppressWarnings("java:S4790")
     public String generateProductHash(String productData) {
         try {
-            // Vulnerable: MD5 is cryptographically broken and should not be used
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] hash = md.digest(productData.getBytes());
             StringBuilder hexString = new StringBuilder();
