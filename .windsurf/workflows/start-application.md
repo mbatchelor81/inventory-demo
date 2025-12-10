@@ -1,5 +1,6 @@
 ---
 description: Start the full-stack inventory service application
+auto_execution_mode: 3
 ---
 
 # Start Inventory Service Demo
