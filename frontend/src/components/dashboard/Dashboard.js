@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllProducts, getAllInventory, getAllOrders } from '../../services/api';
+import { getAllProducts, getAllInventory, getAllOrders, getAllCategories } from '../../services/api';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -7,7 +7,8 @@ const Dashboard = () => {
     totalProducts: 0,
     lowStockItems: 0,
     pendingOrders: 0,
-    totalOrders: 0
+    totalOrders: 0,
+    totalCategories: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,23 +17,25 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const [products, inventory, orders] = await Promise.all([
+        const [products, inventory, orders, categories] = await Promise.all([
           getAllProducts(),
           getAllInventory(),
-          getAllOrders()
+          getAllOrders(),
+          getAllCategories()
         ]);
 
-        // Calculate stats
         const totalProducts = products.length;
         const lowStockItems = inventory.filter(item => item.quantity < 10).length;
         const pendingOrders = orders.filter(order => order.status === 'CREATED' || order.status === 'PROCESSING').length;
         const totalOrders = orders.length;
+        const totalCategories = categories.length;
 
         setStats({
           totalProducts,
           lowStockItems,
           pendingOrders,
-          totalOrders
+          totalOrders,
+          totalCategories
         });
         setError(null);
       } catch (err) {
@@ -108,6 +111,16 @@ const Dashboard = () => {
           <div className="stat-info">
             <h3>{stats.totalOrders}</h3>
             <p>Total Orders</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon categories">
+            <i className="fas fa-tags"></i>
+          </div>
+          <div className="stat-info">
+            <h3>{stats.totalCategories}</h3>
+            <p>Product Categories</p>
           </div>
         </div>
       </div>

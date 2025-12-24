@@ -83,6 +83,12 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
+        List<Product> products = productService.getProductsByCategory(categoryId);
+        return ResponseEntity.ok(products);
+    }
+    
     // INTENTIONAL VULNERABILITY #3: Path Traversal - Unsafe file access
     @SuppressWarnings("java:S2083")
     @GetMapping("/export/{filename}")
